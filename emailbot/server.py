@@ -159,6 +159,10 @@ def webhook():
         body = email.get("body", "") or ""
         date = email.get("date")
         link = email.get("link", "")
+        logger.info(
+            "Email: subject=%r body=%r",
+            subject, body
+        )
 
         if not _is_from_venmo(from_header):
             skipped.append({"id": email_id, "reason": "not_from_venmo"})
