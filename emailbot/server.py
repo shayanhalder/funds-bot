@@ -25,6 +25,14 @@ load_dotenv(os.path.join(_project_root, ".env"))
 
 import actions
 
+# Send all logs to email-log.txt in project root
+_log_path = os.path.join(_project_root, "email-log.txt")
+_file_handler = logging.FileHandler(_log_path, encoding="utf-8")
+_file_handler.setLevel(logging.DEBUG)
+_file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s [%(name)s] %(message)s"))
+logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger().addHandler(_file_handler)
+
 app = Flask(__name__)
 
 # Pickleball club keywords (case-insensitive) to detect relevant emails
