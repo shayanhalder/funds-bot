@@ -90,7 +90,7 @@ def _parse_venmo_subject(subject: str) -> tuple[str, float, str] | None:
         person = m.group(1).strip()
         amount_str = m.group(2).replace(",", "")
         try:
-            amount = float(amount_str)
+            amount = -1 * float(amount_str)
             return (person, amount, "Expense")
         except ValueError:
             return None
@@ -179,7 +179,8 @@ def webhook():
 
         person, amount, category = parsed
         date_str = _format_date(date)
-        notes = "Venmo" + (f" — {link}" if link else "")
+        match = re.search(r'00\s+([\s\S]+?)\s+See transaction', body)
+        notes = match.group(1).strip() if match else ""
         account = "Venmo"
 
         success = actions.add_transaction(
