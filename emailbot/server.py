@@ -5,9 +5,12 @@ pickleball-related Venmo transactions to the spreadsheet.
 
 """
 
+import logging
 import os
 import re
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 from flask import Flask, request, jsonify
 from google.oauth2.service_account import Credentials
@@ -125,6 +128,13 @@ def webhook():
     emails = payload["emails"]
     if not isinstance(emails, list):
         return jsonify({"error": "'emails' must be an array"}), 400
+
+    for email in emails:
+        logger.info(
+            "Email: subject=%r from=%r",
+            email.get("subject", ""),
+            email.get("from", ""),
+        )
 
     try:
         sheet, service = _get_sheet_client()
