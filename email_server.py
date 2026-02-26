@@ -10,32 +10,25 @@ import os
 import re
 from datetime import datetime
 
-logger = logging.getLogger(__name__)
-
 from flask import Flask, request, jsonify
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
-import sys
-
-_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, _project_root)
-
-from dotenv import load_dotenv
-load_dotenv(os.path.join(_project_root, ".env"))
-
 import actions
+from dotenv import load_dotenv
 
-# Send all logs to email-log.txt in project root
-_log_path = os.path.join(_project_root, "email-log.txt")
-_file_handler = logging.FileHandler(_log_path, encoding="utf-8")
-_file_handler.setLevel(logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+load_dotenv(".env")
+
+# Send all logs to email-log.txt
+_file_handler = logging.FileHandler("email-log.txt", encoding="utf-8")
+_file_handler.setLevel(logging.INFO)
 _file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s [%(name)s] %(message)s"))
-logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger().setLevel(logging.INFO)
 logging.getLogger().addHandler(_file_handler)
 
 app = Flask(__name__)
 
-# Pickleball club keywords (case-insensitive) to detect relevant emails
 PICKLEBALL_KEYWORDS = [
     "pickleball", "pickle", "pball", "tryouts", "competition", "comp",
     "tournament", "tourney", "reimbursement", "winter classic", "doubles",
@@ -137,13 +130,6 @@ def webhook():
     if not isinstance(emails, list):
         return jsonify({"error": "'emails' must be an array"}), 400
 
-    for email in emails:
-        logger.info(
-            "Email: subject=%r from=%r",
-            email.get("subject", ""),
-            email.get("from", ""),
-        )
-
     try:
         sheet, service = _get_sheet_client()
     except Exception as e:
@@ -179,7 +165,7 @@ def webhook():
 
         person, amount, category = parsed
         date_str = _format_date(date)
-        match = re.search(r'00\s+([\s\S]+?)\s+See transaction', body)
+        match = re.search(r'\n00\n\n(.*?)\n\nSee transaction \n', body, re.DOTALL)
         notes = match.group(1).strip() if match else ""
         account = "Venmo"
 
