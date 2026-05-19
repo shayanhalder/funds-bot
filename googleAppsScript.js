@@ -6,8 +6,8 @@ const SHEET_NAME = scriptProperties.getProperty("SHEET_NAME");
 
 const PICKLEBALL_KEYWORDS = [
   "pickleball", "pickle", "pball", "tryouts", "competition", "comp",
-  "tournament", "tourney", "reimbursement", "winter classic", "doubles",
-  "mixed", "uci", "uc irvine",
+  "tournament", "tourney", "reimbursement", "classic", "doubles",
+  "mixed", "uci", "uc irvine", "anteater", "stole", 
 ];
 
 // Regex patterns
